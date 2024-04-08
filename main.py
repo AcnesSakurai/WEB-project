@@ -37,7 +37,7 @@ async def help(update, context):
 
 async def info(update, context):
     await update.message.reply_text(
-        "Наш бот не идиален, если Вас заинтересовало гадание, то можете узнать подробнее перейдя по ссылке https://astrohelper.ru/gadaniya/taro/znachenie/ ")
+        "Наш бот не идиален, если Вас заинтересовало гадание, то можете узнать подробнее перейдя по ссылке: https://astrohelper.ru/gadaniya/taro/znachenie/ ")
 
 
 
