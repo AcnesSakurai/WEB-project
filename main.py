@@ -64,7 +64,8 @@ async def day(update, context):
         update.message.chat_id,
         img,
         caption=value,
-        reply_markup=markup)
+        reply_markup=markup
+    )
 
 
 def main():
