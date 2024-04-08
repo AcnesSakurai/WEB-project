@@ -41,6 +41,11 @@ async def info(update, context):
         "Наш бот не идиален, если Вас заинтересовало гадание, то можете узнать подробнее перейдя по ссылке https://gadalkindom.ru/gadanie/taro/znachenie-kart-taro ")
 
 
+async def info(update, context):
+    await update.message.reply_text(
+        "Наш бот не идиален, если Вас заинтересовало гадание, то можете узнать подробнее перейдя по ссылке https://gadalkindom.ru/gadanie/taro/znachenie-kart-taro ")
+
+
 def main():
     application = Application.builder().token(BOT_TOKEN).build()
     text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, start)
