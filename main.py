@@ -20,7 +20,7 @@ TIMER = 5
 
 
 async def start(update, context):
-    img = open('card.png', 'rb')
+    img = open('card.jpg', 'rb')
     await context.bot.send_photo(
         update.message.chat_id,
         img,
