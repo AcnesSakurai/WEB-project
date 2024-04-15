@@ -40,7 +40,8 @@ async def help(update, context):
 
 async def info(update, context):
     await update.message.reply_text(
-        "Наш бот не идиален, если Вас заинтересовало гадание, то можете узнать подробнее перейдя по ссылке https://gadalkindom.ru/gadanie/taro/znachenie-kart-taro ")
+        "Наш бот не идиален, если Вас заинтересовало гадание, то можете узнать подробнее перейдя по ссылке: https://astrohelper.ru/gadaniya/taro/znachenie/ ")
+
 
 
 async def day(update, context):
@@ -85,5 +86,3 @@ def main():
 # Запускаем функцию main() в случае запуска скрипта.
 if __name__ == '__main__':
     main()
-
-
