@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 async def zero():
     reply_keyboard = [['/day', '/love', "/where_love"],
                       ['/money', '/future', '/zz'],
-                      ['/color']]
+                      ['/color', '/card']]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
     reply_keyboard = [['/start', '/help', "/info"]]
 
@@ -30,7 +30,7 @@ async def zero():
 async def start(update, context):
     reply_keyboard = [['/day', '/love', "/where_love"],
                       ['/money', '/future', '/zz'],
-                      ['/color']]
+                      ['/color', '/card']]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
     img = open('card.jpg', 'rb')
     await context.bot.send_photo(
@@ -319,6 +319,89 @@ async def color(update, context):
     return ConversationHandler.END
 
 
+async def card(update, context):
+    reply_keyboard = [['/start', '/help', "/info"]]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+
+    for i in range(5):
+        name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
+        mast = ["Жезлы", "Кубок", "Мечи", "Пентакли", "Высшие арканы"]
+        name_bd = "Taro"
+        con = sqlite3.connect(name_bd)
+        cur = con.cursor()
+        result = cur.execute(
+                f"""SELECT name FROM {name_table[i]}""").fetchall()
+        c = "->" + mast[i] + "<-" + '\n'
+        for i in range(len(result)):
+            c += result[i][0]
+            c += '\n'
+        img = open('card.jpg', 'rb')
+        await update.message.reply_text(c)
+    con.close()
+    await update.message.reply_text("Введите название масти (как в сообщениях выше) карты про которую хотите узнать:")
+    return 1
+
+
+mas = ''
+name = ''
+pl = ""
+
+
+async def nast(update, context):
+    global mas
+    mas = update.message.text.capitalize()
+    await update.message.reply_text("Теперь само название карты (прям как в сообщениях выше):")
+    name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
+    mast = ["Жезлы", "Кубок", "Мечи", "Пентакли", "Высшие арканы"]
+    mas = name_table[mast.index(mas)]
+    return 2
+
+
+async def plmn(update, context):
+    global name
+    name = update.message.text.capitalize()
+    await update.message.reply_text("Перевернутое(-) или нет(+):")
+    return 3
+
+
+async def which(update, context):
+    global name, mas
+
+    reply_keyboard = [['/start', '/help', "/info"]]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+
+    pl = update.message.text
+
+    table = mas
+    name_bd = "Taro"
+    con = sqlite3.connect(name_bd)
+    cur = con.cursor()
+    result = cur.execute(
+            f"""SELECT name FROM {table}""").fetchall()
+
+    up = ["linear", "overturn"]
+    if pl == "+":
+        up = up[0]
+    else:
+        up = up[1]
+
+    result = cur.execute(
+            f"""SELECT {up}, name FROM {table}
+                """).fetchall()
+    value = name
+    for el in result:
+        if el[1] == name:
+            value += el[0]
+    con.close()
+    img = open('card.jpg', 'rb')
+    await context.bot.send_photo(
+        update.message.chat_id,
+        img,
+        caption=value,
+        reply_markup=markup
+    )
+
+
 def main():
     application = Application.builder().token(BOT_TOKEN).build()
 
@@ -334,6 +417,19 @@ def main():
     )
     application.add_handler(conv_handler)
 
+    conv_handler1 = ConversationHandler(
+        entry_points=[CommandHandler('card', card)],
+
+        states={
+            1: [MessageHandler(filters.TEXT & ~filters.COMMAND, nast)],
+            2: [MessageHandler(filters.TEXT & ~filters.COMMAND, plmn)],
+            3: [MessageHandler(filters.TEXT & ~filters.COMMAND, which)]
+        },
+
+        fallbacks=[CommandHandler('plmn', plmn)]
+    )
+    application.add_handler(conv_handler1)
+
     text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, start)
     application.add_handler(text_handler)
     application.add_handler(CommandHandler("help", help))
@@ -346,6 +442,7 @@ def main():
     application.add_handler(CommandHandler("money", money))
     application.add_handler(CommandHandler("zz", zz))
     application.add_handler(CommandHandler("color", color))
+    application.add_handler(CommandHandler("card", card))
     application.run_polling()
 
 
