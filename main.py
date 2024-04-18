@@ -8,9 +8,8 @@ from telegram import ReplyKeyboardMarkup
 
 
 BOT_TOKEN = "6316601466:AAGR0OJks7WwNgvbr6gj2uJzHBU47SH0JK0"
-reply_keyboard = [['/start', '/help', "/info", "/day", "/zz"],
-                  ['/love', '/where_love', "/luck", "/money"]]
 
+reply_keyboard = [['/start', '/help', "/info"]]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
 
 logging.basicConfig(
@@ -19,10 +18,20 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-TIMER = 5
+
+async def zero():
+    reply_keyboard = [['/day', '/love', "/where_love"],
+                      ['/money', '/future', '/zz'],
+                      ['/color']]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+    reply_keyboard = [['/start', '/help', "/info"]]
 
 
 async def start(update, context):
+    reply_keyboard = [['/day', '/love', "/where_love"],
+                      ['/money', '/future', '/zz'],
+                      ['/color']]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
     img = open('card.jpg', 'rb')
     await context.bot.send_photo(
         update.message.chat_id,
@@ -46,6 +55,9 @@ async def info(update, context):
 
 
 async def day(update, context):
+    reply_keyboard = [['/start', '/help', "/info"]]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+
     name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
     table = random.choice(name_table)
     name_bd = "Taro"
@@ -73,7 +85,10 @@ async def day(update, context):
     )
 
 
-async def luck(update, context):
+async def future(update, context):
+    reply_keyboard = [['/start', '/help', "/info"]]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+
     name_card = []
     for i in range(3):
         name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
@@ -111,6 +126,9 @@ async def luck(update, context):
 
 
 async def love(update, context):
+    reply_keyboard = [['/start', '/help', "/info"]]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+
     name_card = []
     for i in range(5):
         name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
@@ -150,6 +168,9 @@ async def love(update, context):
 
 
 async def where_love(update, context):
+    reply_keyboard = [['/start', '/help', "/info"]]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+
     geocoder_uri = "http://geocode-maps.yandex.ru/1.x/"
     response = await get_response(geocoder_uri, params={
         "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
@@ -176,7 +197,8 @@ async def where_love(update, context):
     await context.bot.send_photo(
         update.message.chat_id,
         static_api_request,
-        caption="Нашёл:"
+        caption="Нашёл:",
+        reply_markup=markup
     )
 
 
@@ -188,6 +210,9 @@ async def get_response(url, params):
 
 
 async def money(update, context):
+    reply_keyboard = [['/start', '/help', "/info"]]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+
     name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
     table = random.choice(name_table)
     name_bd = "Taro"
@@ -267,9 +292,30 @@ async def first_response(update, context):
 
 
 async def result(update, context):
+    reply_keyboard = [['/start', '/help', "/info"]]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+
     M = update.message.text
     print(WM)
-    await update.message.reply_text(f"Ваша совместимость: {women[WM][men[M]]}")
+    await update.message.reply_text(f"Ваша совместимость: {women[WM][men[M]]}", reply_markup=markup)
+    return ConversationHandler.END
+
+
+async def color(update, context):
+    reply_keyboard = [['/start', '/help', "/info"]]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+
+    week = ['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота', 'воскресенье']
+    week_color = {
+        "понедельник": ["желтый", "сильный и богатый"],
+        "вторник": ["розовый", "мудрость и  согласие"],
+        "четверг": ["оранжевый", "богатство и успех"],
+        "пятница": ["голубой", "наставник демонов"],
+        "суббота": ["фиолетовый", "безумный везунчик"],
+        "среда": ["зеленый", "мудрость и согласие"],
+        "воскресенье": ["темный желтый", "творческий и счастливый"]
+    }
+    await update.message.reply_text(f" {week_color[week[datetime.datetime.today().weekday()]][1]}", reply_markup=markup)
     return ConversationHandler.END
 
 
@@ -296,9 +342,10 @@ def main():
     application.add_handler(CommandHandler("day", day))
     application.add_handler(CommandHandler("love", love))
     application.add_handler(CommandHandler("where_love", where_love))
-    application.add_handler(CommandHandler("luck", luck))
+    application.add_handler(CommandHandler("future", future))
     application.add_handler(CommandHandler("money", money))
     application.add_handler(CommandHandler("zz", zz))
+    application.add_handler(CommandHandler("color", color))
     application.run_polling()
 
 
