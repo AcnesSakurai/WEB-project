@@ -8,7 +8,7 @@ from telegram import ReplyKeyboardMarkup
 
 
 BOT_TOKEN = "6316601466:AAGR0OJks7WwNgvbr6gj2uJzHBU47SH0JK0"
-reply_keyboard = [['/start', '/help', "/info", "/day"],
+reply_keyboard = [['/start', '/help', "/info", "/day", "/zz"],
                   ['/love', '/where_love', "/luck", "/money"]]
 
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
@@ -162,9 +162,9 @@ async def where_love(update, context):
 
     toponym_coodrinates = toponym["Point"]["pos"]
 
-    toponym_longitude, toponym_lattitude = toponym_coodrinates.split(" ")
+    toponym_longitude, toponym_lattitude = str(random.uniform(-180, 180)), str(random.uniform(-90, 90))
 
-    delta = "0.005"
+    delta = "10"
 
     map_params = {
       "ll": ",".join([toponym_longitude, toponym_lattitude]),
@@ -215,8 +215,7 @@ async def money(update, context):
     )
 
 
-async def zz(update, context):
-    men = {
+men = {
         "овен": 0,
         "телец": 1,
         "близнецы": 2,
@@ -231,7 +230,7 @@ async def zz(update, context):
         "рыбы": 11
     }
 
-    women = {
+women = {
         "овен": [45, 73, 46, 47, 59, 48, 66, 59, 67, 43, 89, 43],
         "телец": [85, 89, 72, 79, 54, 76, 67, 89, 79, 79, 63, 91],
         "близнецы": [51, 63, 75, 57, 48, 56, 73, 60, 66, 86, 89, 38],
@@ -246,15 +245,49 @@ async def zz(update, context):
         "рыбы": [45, 92, 39, 72, 52, 63, 68, 65, 82, 69, 46, 76]
     }
 
+
+async def zz(update, context):
     await update.message.reply_text(
         "Напишите знак зодиака женщины:"
     )
 
-    print(update.message.text)
+    return 1
+
+WM = ""
+M = ""
+
+
+async def first_response(update, context):
+    global WM
+    WM = update.message.text
+    print(WM)
+    await update.message.reply_text(
+        "Теперь напишите знак мужчины:")
+    return 2
+
+
+async def result(update, context):
+    M = update.message.text
+    print(WM)
+    await update.message.reply_text(f"Ваша совместимость: {women[WM][men[M]]}")
+    return ConversationHandler.END
 
 
 def main():
     application = Application.builder().token(BOT_TOKEN).build()
+
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('zz', zz)],
+
+        states={
+            1: [MessageHandler(filters.TEXT & ~filters.COMMAND, first_response)],
+            2: [MessageHandler(filters.TEXT & ~filters.COMMAND, result)]
+        },
+
+        fallbacks=[CommandHandler('result', result)]
+    )
+    application.add_handler(conv_handler)
+
     text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, start)
     application.add_handler(text_handler)
     application.add_handler(CommandHandler("help", help))
