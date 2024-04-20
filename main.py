@@ -315,7 +315,14 @@ async def color(update, context):
         "среда": ["зеленый", "мудрость и согласие"],
         "воскресенье": ["темный желтый", "творческий и счастливый"]
     }
-    await update.message.reply_text(f" {week_color[week[datetime.datetime.today().weekday()]][1]}", reply_markup=markup)
+    img = open(f'D:\prog\Taro_bot\color\{week_color[week[datetime.datetime.today().weekday()]][0]}.jpg', 'rb')
+    await context.bot.send_photo(
+        update.message.chat_id,
+        img,
+        caption=f" {week_color[week[datetime.datetime.today().weekday()]][1]}",
+        reply_markup=markup
+    )
+
     return ConversationHandler.END
 
 
