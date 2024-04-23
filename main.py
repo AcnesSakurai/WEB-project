@@ -37,7 +37,7 @@ async def start(update, context):
         update.message.chat_id,
         img,
         caption="Приветствую в нашем уютном боте! Тут вы узнаете будущее и немножко больше) \n"
-                "Выберите какой расклад вам нужен:",
+                "Выберите тип расклада, который Вам подходит:",
         reply_markup=markup
     )
 
