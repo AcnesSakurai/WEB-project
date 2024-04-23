@@ -36,7 +36,8 @@ async def start(update, context):
     await context.bot.send_photo(
         update.message.chat_id,
         img,
-        caption="Приветствую в нашем уютном боте! Тут вы узнаете будущее и немножко больше) выберите какой расклад вам нужен:",
+        caption="Приветствую в нашем уютном боте! Тут вы узнаете будущее и немножко больше) \n"
+                "Выберите какой расклад вам нужен:",
         reply_markup=markup
     )
 
@@ -273,7 +274,7 @@ women = {
 
 async def zz(update, context):
     await update.message.reply_text(
-        "Напишите знак зодиака женщины:"
+        "Напишите знак зодиака девушки:"
     )
 
     return 1
@@ -287,7 +288,7 @@ async def first_response(update, context):
     WM = update.message.text
     print(WM)
     await update.message.reply_text(
-        "Теперь напишите знак мужчины:")
+        "Теперь напишите знак юноши:")
     return 2
 
 
@@ -345,7 +346,7 @@ async def card(update, context):
         img = open('card.jpg', 'rb')
         await update.message.reply_text(c)
     con.close()
-    await update.message.reply_text("Введите название масти (как в сообщениях выше) карты про которую хотите узнать:")
+    await update.message.reply_text("Введите название масти карты, которую вы хотите узнать(масть карты должна быть написана эдентично тексту из сообщения выше):")
     return 1
 
 
@@ -357,7 +358,7 @@ pl = ""
 async def nast(update, context):
     global mas
     mas = update.message.text.capitalize()
-    await update.message.reply_text("Теперь само название карты (прям как в сообщениях выше):")
+    await update.message.reply_text("Теперь введите название карты (название карты должно быть написано эдентично тексту из сообщения выше):")
     name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
     mast = ["Жезлы", "Кубок", "Мечи", "Пентакли", "Высшие арканы"]
     mas = name_table[mast.index(mas)]
@@ -367,7 +368,7 @@ async def nast(update, context):
 async def plmn(update, context):
     global name
     name = update.message.text.capitalize()
-    await update.message.reply_text("Перевернутое(-) или нет(+):")
+    await update.message.reply_text("Укажите тип карты: Перевернутое(-) или нет(+):")
     return 3
 
 
