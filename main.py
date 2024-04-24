@@ -54,37 +54,59 @@ async def help(update, context):
         f"Привет! Я готова тебе помочь с любым возникшим вопросом. Вот что я умею: \n"
         "1. /start - запускает бота-таролога, \n"
         "2. /help - выводит список доступных команд, \n"
-        "3. /info - выводит дополнительную информацию о боте-тарологе и дополнительную информацию о гаданиях и значениях карт \n")
+        "3. /info - выводит дополнительную информацию о боте-тарологе и дополнительную информацию о гаданиях"
+        " и значениях карт \n")
 
 
 async def info(update, context):
     await update.message.reply_text(
-        "Наш бот не идиален, но мы изо всех сил стараемся его улучшить. Если Вас заинтересовало гадание, то можете узнать подробнее перейдя по ссылке: https://astrohelper.ru/gadaniya/taro/znachenie/ ")
+        "Наш бот не идиален, но мы изо всех сил стараемся его улучшить. Если Вас заинтересовало гадание, то можете "
+        "узнать подробнее перейдя по ссылке: https://astrohelper.ru/gadaniya/taro/znachenie/ ")
 
 
 async def day(update, context):
     reply_keyboard = [['/start', '/help', "/info"]]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
 
-    name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
-    table = random.choice(name_table)
-    name_bd = "Taro"
-    con = sqlite3.connect(name_bd)
-    cur = con.cursor()
-    result = cur.execute(
-        f"""SELECT name FROM {table}""").fetchall()
-    name = list(random.choice(result))
-    name = name[0]
-    up = random.choice(["linear", "overturn"])
-    result = cur.execute(
-        f"""SELECT {up}, name FROM {table}
-                """).fetchall()
-    value = name
-    for el in result:
-        if el[1] == name:
-            value += el[0]
-    con.close()
-    img = open('card.jpg', 'rb')
+    db_session.global_init("db/Taro.db")
+
+    v = random.choice(["Cup", "Senior", "Swords", "Wands", "Pentacles"])
+
+    if v == "Senior":
+        mast = random.randint(1, 22)
+    else:
+        mast = random.randint(1, 14)
+
+    n = random.choice([0, 1])
+
+    db_sess = db_session.create_session()
+    if v == "Cup":
+        if n == 0:
+            value = db_sess.query(Cup).filter(Cup.id == mast).first().overturn
+        else:
+            value = db_sess.query(Cup).filter(Cup.id == mast).first().linear
+    if v == "Senior":
+        if n == 0:
+            value = db_sess.query(Senior).filter(Senior.id == mast).first().overturn
+        else:
+            value = db_sess.query(Senior).filter(Senior.id == mast).first().linear
+    if v == "Swords":
+        if n == 0:
+            value = db_sess.query(Swords).filter(Swords.id == mast).first().overturn
+        else:
+            value = db_sess.query(Swords).filter(Swords.id == mast).first().linear
+    if v == "Wands":
+        if n == 0:
+            value = db_sess.query(Wands).filter(Wands.id == mast).first().overturn
+        else:
+            value = db_sess.query(Wands).filter(Wands.id == mast).first().linear
+    if v == "Pentacles":
+        if n == 0:
+            value = db_sess.query(Pentacles).filter(Pentacles.id == mast).first().overturn
+        else:
+            value = db_sess.query(Pentacles).filter(Pentacles.id == mast).first().linear
+
+    img = open(f'Cards/{v}/{mast}.jpg', 'rb')
     await context.bot.send_photo(
         update.message.chat_id,
         img,
@@ -99,32 +121,51 @@ async def future(update, context):
 
     name_card = []
     for i in range(3):
-        name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
-        table = random.choice(name_table)
-        name_bd = "Taro"
-        con = sqlite3.connect(name_bd)
-        cur = con.cursor()
+        db_session.global_init("db/Taro.db")
 
-        result = cur.execute(
-            f"""SELECT name FROM {table}""").fetchall()
-        name = list(random.choice(result))
-        name = name[0]
-        while name in name_card:
-            name = list(random.choice(result))
-            name = name[0]
-        name_card.append(name)
+        v = random.choice(["Cup", "Senior", "Swords", "Wands", "Pentacles"])
 
-        up = random.choice(["linear", "overturn"])
-        result = cur.execute(
-            f"""SELECT {up}, name FROM {table}
-                    """).fetchall()
-        value = name
-        for el in result:
-            if el[1] == name:
-                value += el[0]
-        con.close()
+        if v == "Senior":
+            mast = random.randint(1, 22)
+        else:
+            mast = random.randint(1, 14)
 
-        img = open('card.jpg', 'rb')
+        while mast in name_card:
+            if v == "Senior":
+                mast = random.randint(1, 22)
+            else:
+                mast = random.randint(1, 14)
+
+        n = random.choice([0, 1])
+
+        db_sess = db_session.create_session()
+        if v == "Cup":
+            if n == 0:
+                value = db_sess.query(Cup).filter(Cup.id == mast).first().overturn
+            else:
+                value = db_sess.query(Cup).filter(Cup.id == mast).first().linear
+        if v == "Senior":
+            if n == 0:
+                value = db_sess.query(Senior).filter(Senior.id == mast).first().overturn
+            else:
+                value = db_sess.query(Senior).filter(Senior.id == mast).first().linear
+        if v == "Swords":
+            if n == 0:
+                value = db_sess.query(Swords).filter(Swords.id == mast).first().overturn
+            else:
+                value = db_sess.query(Swords).filter(Swords.id == mast).first().linear
+        if v == "Wands":
+            if n == 0:
+                value = db_sess.query(Wands).filter(Wands.id == mast).first().overturn
+            else:
+                value = db_sess.query(Wands).filter(Wands.id == mast).first().linear
+        if v == "Pentacles":
+            if n == 0:
+                value = db_sess.query(Pentacles).filter(Pentacles.id == mast).first().overturn
+            else:
+                value = db_sess.query(Pentacles).filter(Pentacles.id == mast).first().linear
+
+        img = open(f'Cards/{v}/{mast}.jpg', 'rb')
         await context.bot.send_photo(
             update.message.chat_id,
             img,
@@ -139,32 +180,51 @@ async def love(update, context):
 
     name_card = []
     for i in range(5):
-        name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
-        table = random.choice(name_table)
-        name_bd = "Taro"
-        con = sqlite3.connect(name_bd)
-        cur = con.cursor()
+        db_session.global_init("db/Taro.db")
 
-        result = cur.execute(
-            f"""SELECT name FROM {table}""").fetchall()
-        name = list(random.choice(result))
-        name = name[0]
-        while name in name_card:
-            name = list(random.choice(result))
-            name = name[0]
-        name_card.append(name)
+        v = random.choice(["Cup", "Senior", "Swords", "Wands", "Pentacles"])
 
-        up = random.choice(["linear", "overturn"])
-        result = cur.execute(
-            f"""SELECT {up}, name FROM {table}
-                    """).fetchall()
-        value = name
-        for el in result:
-            if el[1] == name:
-                value += el[0]
-        con.close()
+        if v == "Senior":
+            mast = random.randint(1, 22)
+        else:
+            mast = random.randint(1, 14)
 
-        img = open('card.jpg', 'rb')
+        while mast in name_card:
+            if v == "Senior":
+                mast = random.randint(1, 22)
+            else:
+                mast = random.randint(1, 14)
+
+        n = random.choice([0, 1])
+
+        db_sess = db_session.create_session()
+        if v == "Cup":
+            if n == 0:
+                value = db_sess.query(Cup).filter(Cup.id == mast).first().overturn
+            else:
+                value = db_sess.query(Cup).filter(Cup.id == mast).first().linear
+        if v == "Senior":
+            if n == 0:
+                value = db_sess.query(Senior).filter(Senior.id == mast).first().overturn
+            else:
+                value = db_sess.query(Senior).filter(Senior.id == mast).first().linear
+        if v == "Swords":
+            if n == 0:
+                value = db_sess.query(Swords).filter(Swords.id == mast).first().overturn
+            else:
+                value = db_sess.query(Swords).filter(Swords.id == mast).first().linear
+        if v == "Wands":
+            if n == 0:
+                value = db_sess.query(Wands).filter(Wands.id == mast).first().overturn
+            else:
+                value = db_sess.query(Wands).filter(Wands.id == mast).first().linear
+        if v == "Pentacles":
+            if n == 0:
+                value = db_sess.query(Pentacles).filter(Pentacles.id == mast).first().overturn
+            else:
+                value = db_sess.query(Pentacles).filter(Pentacles.id == mast).first().linear
+
+        img = open(f'Cards/{v}/{mast}.jpg', 'rb')
         await context.bot.send_photo(
             update.message.chat_id,
             img,
@@ -201,7 +261,8 @@ async def where_love(update, context):
         "l": "map"
     }
 
-    static_api_request = f"http://static-maps.yandex.ru/1.x/?ll={map_params['ll']}&spn={map_params['spn']}&l={map_params['l']}"
+    static_api_request = f"http://static-maps.yandex.ru/1.x/?ll={map_params['ll']}&spn={map_params['spn']}" \
+                         f"&l={map_params['l']}"
     await context.bot.send_photo(
         update.message.chat_id,
         static_api_request,
@@ -221,25 +282,45 @@ async def money(update, context):
     reply_keyboard = [['/start', '/help', "/info"]]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
 
-    name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
-    table = random.choice(name_table)
-    name_bd = "Taro"
-    con = sqlite3.connect(name_bd)
-    cur = con.cursor()
-    result = cur.execute(
-        f"""SELECT name FROM {table}""").fetchall()
-    name = list(random.choice(result))
-    name = name[0]
-    up = random.choice(["linear", "overturn"])
-    result = cur.execute(
-        f"""SELECT {up}, name FROM {table}
-                """).fetchall()
-    value = name
-    for el in result:
-        if el[1] == name:
-            value += el[0]
-    con.close()
-    img = open('card.jpg', 'rb')
+    db_session.global_init("db/Taro.db")
+
+    v = random.choice(["Cup", "Senior", "Swords", "Wands", "Pentacles"])
+
+    if v == "Senior":
+        mast = random.randint(1, 22)
+    else:
+        mast = random.randint(1, 14)
+
+    n = random.choice([0, 1])
+
+    db_sess = db_session.create_session()
+    if v == "Cup":
+        if n == 0:
+            value = db_sess.query(Cup).filter(Cup.id == mast).first().overturn
+        else:
+            value = db_sess.query(Cup).filter(Cup.id == mast).first().linear
+    if v == "Senior":
+        if n == 0:
+            value = db_sess.query(Senior).filter(Senior.id == mast).first().overturn
+        else:
+            value = db_sess.query(Senior).filter(Senior.id == mast).first().linear
+    if v == "Swords":
+        if n == 0:
+            value = db_sess.query(Swords).filter(Swords.id == mast).first().overturn
+        else:
+            value = db_sess.query(Swords).filter(Swords.id == mast).first().linear
+    if v == "Wands":
+        if n == 0:
+            value = db_sess.query(Wands).filter(Wands.id == mast).first().overturn
+        else:
+            value = db_sess.query(Wands).filter(Wands.id == mast).first().linear
+    if v == "Pentacles":
+        if n == 0:
+            value = db_sess.query(Pentacles).filter(Pentacles.id == mast).first().overturn
+        else:
+            value = db_sess.query(Pentacles).filter(Pentacles.id == mast).first().linear
+
+    img = open(f'Cards/{v}/{mast}.jpg', 'rb')
     await context.bot.send_photo(
         update.message.chat_id,
         img,
@@ -294,7 +375,6 @@ M = ""
 async def first_response(update, context):
     global WM
     WM = update.message.text
-    print(WM)
     await update.message.reply_text(
         "Теперь напишите знак юноши:")
     return 2
@@ -305,8 +385,8 @@ async def result(update, context):
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
 
     M = update.message.text
-    print(WM)
-    await update.message.reply_text(f"Ваша совместимость: {women[WM][men[M]]}", reply_markup=markup)
+    await update.message.reply_text(
+        f"Ваша совместимость: {women[WM.lower()][men[M.lower()]]}, но не стоит мне верить <3", reply_markup=markup)
     return ConversationHandler.END
 
 
@@ -328,7 +408,8 @@ async def color(update, context):
     await context.bot.send_photo(
         update.message.chat_id,
         img,
-        caption=f" {week_color[week[datetime.datetime.today().weekday()]][1]}",
+        caption=f"Сегодня {week[datetime.datetime.today().weekday()]}, а в тайской культуре этот день означает:"
+                f" {week_color[week[datetime.datetime.today().weekday()]][1]}",
         reply_markup=markup
     )
 
@@ -342,7 +423,7 @@ async def card(update, context):
     for i in range(5):
         name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
         mast = ["Жезлы", "Кубок", "Мечи", "Пентакли", "Высшие арканы"]
-        name_bd = "Taro"
+        name_bd = "db/Taro.db"
         con = sqlite3.connect(name_bd)
         cur = con.cursor()
         result = cur.execute(
@@ -353,9 +434,10 @@ async def card(update, context):
             c += '\n'
         img = open('card.jpg', 'rb')
         await update.message.reply_text(c)
-    con.close()
+        con.close()
     await update.message.reply_text(
-        "Введите название масти карты, которую вы хотите узнать(масть карты должна быть написана эдентично тексту из сообщения выше):")
+        "Введите название масти карты, которую вы хотите узнать(масть карты должна быть написана эдентично"
+        " тексту из сообщения выше):")
     return 1
 
 
@@ -368,7 +450,7 @@ async def nast(update, context):
     global mas
     mas = update.message.text.capitalize()
     await update.message.reply_text(
-        "Теперь введите название карты (название карты должно быть написано эдентично тексту из сообщения выше):")
+        "Теперь введите название карты (название карты должно быть написано эндентично тексту из сообщения выше):")
     name_table = ["Wands", "Cup", "Swords", "Pentacles", "Senior"]
     mast = ["Жезлы", "Кубок", "Мечи", "Пентакли", "Высшие арканы"]
     mas = name_table[mast.index(mas)]
@@ -391,7 +473,7 @@ async def which(update, context):
     pl = update.message.text
 
     table = mas
-    name_bd = "Taro"
+    name_bd = "db/Taro.db"
     con = sqlite3.connect(name_bd)
     cur = con.cursor()
     result = cur.execute(
@@ -406,12 +488,17 @@ async def which(update, context):
     result = cur.execute(
         f"""SELECT {up}, name FROM {table}
                 """).fetchall()
-    value = name
+    value = ""
     for el in result:
         if el[1] == name:
             value += el[0]
+
+    result = cur.execute(
+        f"""SELECT id FROM {table} WHERE name = '{name}';   
+                """).fetchall()
+    w = result[0][0]
     con.close()
-    img = open('card.jpg', 'rb')
+    img = open(f'Cards/{mas}/{w}.jpg', 'rb')
     await context.bot.send_photo(
         update.message.chat_id,
         img,
@@ -464,48 +551,5 @@ def main():
     application.run_polling()
 
 
-db_session.global_init("db/Taro.db")
-
-v = random.choice(["Cup", "Senior", "Swords", "Wands", "Pentacles"])
-
-if v == "Senior":
-    mast = random.randint(1, 22)
-else:
-    mast = random.randint(1, 14)
-print(v, mast)
-
-n = random.choice([0, 1])
-
-
-def main1():
-    db_sess = db_session.create_session()
-    if v == "Cup":
-        if n == 0:
-            print(db_sess.query(Cup).filter(Cup.id == mast).first().overturn, )
-        else:
-            print(db_sess.query(Cup).filter(Cup.id == mast).first().linear)
-    if v == "Senior":
-        if n == 0:
-            print(db_sess.query(Senior).filter(Senior.id == mast).first().overturn)
-        else:
-            print(db_sess.query(Senior).filter(Senior.id == mast).first().linear)
-    if v == "Swords":
-        if n == 0:
-            print(db_sess.query(Swords).filter(Swords.id == mast).first().overturn)
-        else:
-            print(db_sess.query(Swords).filter(Swords.id == mast).first().linear)
-    if v == "Wands":
-        if n == 0:
-            print(db_sess.query(Wands).filter(Wands.id == mast).first().overturn)
-        else:
-            print(db_sess.query(Wands).filter(Wands.id == mast).first().linear)
-    if v == "Pentacles":
-        if n == 0:
-            print(db_sess.query(Pentacles).filter(Pentacles.id == mast).first().overturn)
-        else:
-            print(db_sess.query(Pentacles).filter(Pentacles.id == mast).first().linear)
-
-
-# Запускаем функцию main() в случае запуска скрипта.
 if __name__ == '__main__':
     main()
