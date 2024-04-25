@@ -68,7 +68,7 @@ async def help(update, context):
 
 async def info(update, context):
     await update.message.reply_text(
-        "Наш бот не идиален, но мы изо всех сил стараемся его улучшить. Если Вас заинтересовало гадание, то можете "
+        "Наш бот не идеален, но мы изо всех сил стараемся его улучшить. Если Вас заинтересовало гадание, то можете "
         "узнать подробнее перейдя по ссылке: https://astrohelper.ru/gadaniya/taro/znachenie/ ")
 
 
@@ -240,7 +240,7 @@ async def love(update, context):
             reply_markup=markup
         )
     await update.message.reply_text(
-        "Любить себя нужно сильнее кого либо <3")
+        "Любить себя нужно сильнее чем кого либо <3")
 
 
 async def where_love(update, context):
@@ -444,7 +444,7 @@ async def card(update, context):
         await update.message.reply_text(c)
         con.close()
     await update.message.reply_text(
-        "Введите название масти карты, которую вы хотите узнать(масть карты должна быть написана эдентично"
+        "Введите название масти карты, о которой вы хотите узнать(масть карты должна быть написана эдентично"
         " тексту из сообщения выше):")
     return 1
 
